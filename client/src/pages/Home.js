@@ -3,6 +3,8 @@ import axios from "axios";
 import { runAudit } from "../utils/audit";
 import { Link } from "react-router-dom";
 
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 function Home() {
   const [tools, setTools] = useState([{ name: "", plan: "", cost: "", seats: "" }]);
   const [teamSize, setTeamSize] = useState("");
@@ -62,7 +64,7 @@ function Home() {
 
     // Save to backend
     try {
-      const res = await axios.post("http://localhost:5000/api/audit/create", {
+      const res = await axios.post(`${API_URL}/api/audit/create`, {
         tools: formattedTools,
         teamSize: parseInt(teamSize) || 1,
         useCase,
@@ -80,7 +82,7 @@ function Home() {
     if (!shareId || !email) return;
 
     try {
-      await axios.post("http://localhost:5000/api/audit/email", {
+      await axios.post(`${API_URL}/api/audit/email`, {
         shareId,
         email
       });

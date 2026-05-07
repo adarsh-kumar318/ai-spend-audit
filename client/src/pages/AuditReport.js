@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 function AuditReport() {
   const { id } = useParams();
   const [data, setData] = useState(null);
@@ -13,7 +15,7 @@ function AuditReport() {
   useEffect(() => {
     const fetchAudit = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/audit/${id}`);
+        const res = await axios.get(`${API_URL}/api/audit/${id}`);
         setData(res.data);
       } catch (err) {
         console.error(err);
@@ -33,7 +35,7 @@ function AuditReport() {
   const handleSendReport = async () => {
     if (!email) return;
     try {
-      await axios.post(`http://localhost:5000/api/audit/email`, { shareId: id, email });
+      await axios.post(`${API_URL}/api/audit/email`, { shareId: id, email });
       setEmailSent(true);
     } catch (err) {
       console.error(err);
