@@ -21,6 +21,10 @@ const auditSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  auditBreakdown: {
+    type: Array,
+    required: true
+  },
   shareId: {
     type: String,
     required: true,

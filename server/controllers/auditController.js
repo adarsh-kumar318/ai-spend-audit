@@ -1,22 +1,40 @@
 const Audit = require('../models/Audit');
 const { nanoid } = require('nanoid');
-const nodemailer = require('nodemailer');
 
 const createAudit = async (req, res) => {
   try {
-    const { tools, teamSize, useCase, totalSavings } = req.body;
+    const { tools, teamSize, useCase } = req.body;
+
+    if (!tools || !Array.isArray(tools)) {
+      return res.status(400).json({ error: "Invalid tools data" });
+    }
+
     const shareId = nanoid(10);
+
+    const { runAuditEngine } = require('../utils/auditEngine');
+    const engineResult = runAuditEngine({ tools, teamSize, useCase });
+    
+    const auditBreakdown = engineResult.auditBreakdown;
+    const totalSavings = engineResult.totalSavings;
 
     const audit = new Audit({
       tools,
       teamSize,
       useCase,
       totalSavings,
+      auditBreakdown,
       shareId
     });
 
     await audit.save();
-    res.status(201).json({ message: "Audit saved successfully", shareId });
+
+    res.status(201).json({
+      message: "Audit saved successfully",
+      shareId,
+      totalSavings,
+      auditBreakdown
+    });
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -35,21 +53,13 @@ const attachEmail = async (req, res) => {
     if (!audit) {
       return res.status(404).json({ message: "Audit not found" });
     }
-
-    // Mock sending email via nodemailer
-    const transport = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
-      auth: {
-          user: 'mock_user@ethereal.email',
-          pass: 'mock_password'
-      }
-    });
-
-    console.log(`[MOCK EMAIL] Sending audit report to ${email} for shareId: ${shareId}`);
-    console.log(`[MOCK EMAIL] Total Savings: $${audit.totalSavings}`);
-    
-    // In production, we'd do transport.sendMail(...)
+    if (process.env.NODE_ENV === "production") {
+      // Send real email here
+      // const transport = nodemailer.createTransport({ ... });
+      // await transport.sendMail({ ... });
+    } else {
+      console.log(`[EMAIL MOCK] Sent audit to ${email}`);
+    }
 
     res.status(200).json({ message: "Email attached and confirmation sent" });
   } catch (error) {
@@ -72,6 +82,7 @@ const getAudit = async (req, res) => {
       teamSize: audit.teamSize,
       useCase: audit.useCase,
       totalSavings: audit.totalSavings,
+      auditBreakdown: audit.auditBreakdown,
       shareId: audit.shareId,
       createdAt: audit.createdAt
     };
