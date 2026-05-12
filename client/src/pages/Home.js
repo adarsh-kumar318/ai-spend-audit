@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { runAudit } from "../utils/audit";
 import { Link } from "react-router-dom";
+import logo from "../logo.png";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
@@ -98,6 +99,7 @@ function Home() {
       {!result && (
         <div className="max-w-2xl w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-8 shadow-2xl">
           <div className="text-center mb-8">
+            <img src={logo} alt="AI Spend Audit Logo" className="h-24 mx-auto mb-4 object-contain" />
             <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-2">
               AI Spend Audit
             </h2>
