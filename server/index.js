@@ -57,14 +57,14 @@ app.use('/api/audit', auditRoutes);
 if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'production' /* checking both just in case */) {
   app.use(express.static(path.join(__dirname, '../client/build')));
 
-  app.get('*', (req, res) => {
+  app.use((req, res) => {
     res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'));
   });
 } else {
   // If not in production, you might still want a basic fallback or leave it to React dev server
   app.use(express.static(path.join(__dirname, '../client/build')));
 
-  app.get('*', (req, res) => {
+  app.use((req, res) => {
     res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'));
   });
 }
