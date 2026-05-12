@@ -4,6 +4,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const { Resend } = require('resend');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 
 dotenv.config();
 
@@ -51,6 +52,22 @@ app.get('/test-email', async (req, res) => {
 });
 
 app.use('/api/audit', auditRoutes);
+
+// Serve frontend static files in production
+if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'production' /* checking both just in case */) {
+  app.use(express.static(path.join(__dirname, '../client/build')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'));
+  });
+} else {
+  // If not in production, you might still want a basic fallback or leave it to React dev server
+  app.use(express.static(path.join(__dirname, '../client/build')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'));
+  });
+}
 
 const PORT = process.env.PORT || 5000;
 
